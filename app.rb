@@ -29,3 +29,27 @@ customer.update(name: 'Jill') # does both modification and save
 
 ## Remove an object
 customer.destroy
+
+
+############################################################
+# Breakout
+############################################################
+
+customer = Customer.last
+
+# Retrieve all the orders related to a customer
+orders = customer.orders
+# you can even filter out those results
+orders = customers.orders.where('order_date > ?', 2.days.ago)
+
+# you can create a new order from a customer object and automatally setup the relationship
+order = customers.orders.new(order_date: Date.today)
+order.save
+
+# Lets create some orders with products attached to them.
+order.order_items.create(product: Product.first)
+
+# or
+
+product = Product.last
+product.order_items.create(order: order)

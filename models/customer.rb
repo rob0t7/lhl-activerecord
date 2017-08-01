@@ -1,4 +1,7 @@
 class Customer < ActiveRecord::Base
+  # Relationships
+  has_many :orders
+
   # validations
   validates :name, presence: true
   validates :dob,  presence: true

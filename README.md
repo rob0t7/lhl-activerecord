@@ -66,6 +66,72 @@ bundle install
 ruby app
 ```
 
+## Breakout Lesson
+
+During our breakout we looked at how to set up relationships between
+objects. We specifically looked at the following items:
+
+* 1-to-many relationships
+* many-to-many relationships
+* how to retrieve and create models using these relationships
+* Prefetch records (the N+1 problem)
+
+### Active Record Relationships
+
+In order to create a relationship between two DB backed objects we
+have to do two things. 1) Setup the relationship info on the models
+themselves, and 2) add the references to the database schema.
+
+The sample code has many examples on how to create the different
+relationships. Please check it out.
+
+To create a many-to-many relationship there exists a few extra steps,
+depending on whether you want a pure join table or 1 with extra
+information.
+
+For a pure join table you need to do the following:
+
+1. Add *belongs_and_has_many to the models
+2. Create a join table (using *create_join_table* for Rails >5.0 or
+   manually with create_table) were the name of the table is the name
+   of the two models in alphabetical order. Example Orders <=>
+   Products would have a orders_products table.
+
+If you are not using a pure join you will have to create a table and
+model similar to the example code. See OrderItem model.
+
+### Prefetch Data
+
+When we are returning JSON/HTML for a summary page (thing GET index)
+we tend to fetch a bunch of records, then in a loop for each record
+fetch all the corresponding records. This leads to the N+1 problem
+where we are overloaded with DB calls.
+
+Here is some sample code
+
+``` ruby
+Order.all.each do |order|
+  puts "Order #{order.id} has the following products:"
+  order.order_items.each do |order_item|
+    puts order_item.product.name
+  end
+end
+```
+
+The above function is really bad for performance since it does 1 call
+for fetching all the orders and 2 * Num of Orders calls respectively
+to the Product and OrderItem tables. We can reduce this to three calls
+by prefetch data
+
+``` ruby
+Order.includes(order_items: [:product]).each do |order|
+  puts "Order #{order.id} has the following products:"
+  order.order_items.each do |order_item|
+    puts order_item.product.name
+  end
+end
+```
+
 ## Further Reading
 
 * [Bundler](http://bundler.io)
